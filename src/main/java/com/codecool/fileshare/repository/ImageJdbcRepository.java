@@ -3,6 +3,7 @@ package com.codecool.fileshare.repository;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -68,12 +69,32 @@ public class ImageJdbcRepository implements ImageRepository {
     }
 
     /**
-     * @param uuid
-     * implement readImage from database here
+     * @param uuid implement readImage from database here
      * @return base64 encoded image
      */
     @Override
     public String readImage(String uuid) {
+        DataSource ds = null;
+        try {
+            ds = dc.connect();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try (Connection conn = ds.getConnection()) {
+            String sql = "SELECT content FROM image WHERE id::text = ?;";
+            PreparedStatement st = conn.prepareStatement(sql);
+            st.setString(1, uuid);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                byte[] bytes = rs.getBytes(1);
+                return new String(bytes, StandardCharsets.UTF_8);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }
