@@ -1,11 +1,11 @@
-package com.codecool.fileshare.controller;
+package com.codecool.fileshare.repository;
 
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
-public class DatabaseController {
+public class DatabaseConnectionManager {
 
     public DataSource connect() throws SQLException {
         PGSimpleDataSource ds = new PGSimpleDataSource();

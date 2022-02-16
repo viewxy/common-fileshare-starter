@@ -1,6 +1,5 @@
 package com.codecool.fileshare.repository;
 
-import com.codecool.fileshare.controller.DatabaseController;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -12,7 +11,7 @@ import java.sql.SQLException;
 
 @Component("jdbc")
 public class ImageJdbcRepository implements ImageRepository {
-    DatabaseController dc = new DatabaseController();
+    DatabaseConnectionManager dc = new DatabaseConnectionManager();
 
     /**
      * implement store image in database here
@@ -35,7 +34,7 @@ public class ImageJdbcRepository implements ImageRepository {
             PreparedStatement st = conn.prepareStatement(sql);
             st.setString(1, category);
             st.setBytes(2, content.getBytes());
-            st.setString(3, "null");
+            st.setString(3, getExtensionFromContent(content));
             st.executeUpdate();
 
         } catch (SQLException e) {
@@ -60,6 +59,12 @@ public class ImageJdbcRepository implements ImageRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private String getExtensionFromContent(String content) {
+        int startIndex = content.indexOf('/') + 1;
+        int endIndex = content.indexOf(';');
+        return content.substring(startIndex, endIndex);
     }
 
     /**
